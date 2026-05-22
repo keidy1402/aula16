@@ -1,4 +1,3 @@
-import os
 import json
 import re
 import urllib.request
@@ -8,44 +7,28 @@ from typing import List, Dict
 import streamlit as st
 import google.generativeai as genai
 
-# =========================================================
 # CONFIGURAÇÃO DA PÁGINA
-# =========================================================
-
 st.set_page_config(
     page_title="Analisador de Privacidade",
     page_icon="🔒",
     layout="wide"
 )
 
-# =========================================================
 # CHAVES DAS APIs
-# =========================================================
 
-GEMINI_API_KEY = st.secrets["AIzaSyB7S6S4qzxCXTIhT5VlliHzOoT9IEFGcXc"]
+GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 NEWSAPI_KEY = st.secrets["NEWSAPI_KEY"]
 
-if not GEMINI_API_KEY:
-    st.error("Defina a variável de ambiente GEMINI_API_KEY")
-    st.stop()
 
-if not NEWSAPI_KEY:
-    st.error("Defina a variável de ambiente NEWSAPI_KEY")
-    st.stop()
-
-# =========================================================
 # CONFIGURAÇÃO GEMINI
-# =========================================================
 
-genai.configure(api_key=AIzaSyB7S6S4qzxCXTIhT5VlliHzOoT9IEFGcXc)
+genai.configure(api_key=GEMINI_API_KEY)
 
 model = genai.GenerativeModel(
     model_name="gemini-2.0-flash"
 )
 
-# =========================================================
 # FUNÇÃO: BUSCAR NOTÍCIAS
-# =========================================================
 
 def buscar_noticias(plataforma: str) -> List[Dict]:
 
@@ -64,7 +47,6 @@ def buscar_noticias(plataforma: str) -> List[Dict]:
             data = json.loads(response.read().decode())
 
         if data.get("status") != "ok":
-            print(data)
             return []
 
         noticias = []
@@ -89,13 +71,10 @@ def buscar_noticias(plataforma: str) -> List[Dict]:
 
         return noticias
 
-    except Exception as e:
-        print(f"Erro NewsAPI: {e}")
+    except Exception:
         return []
 
-# =========================================================
 # PROMPT
-# =========================================================
 
 def build_prompt(plataforma: str, noticias: List[Dict]) -> str:
 
@@ -171,9 +150,7 @@ REGRAS:
   3 = alto
 """
 
-# =========================================================
 # EXTRAIR JSON
-# =========================================================
 
 def extrair_json(texto: str):
 
@@ -187,9 +164,7 @@ def extrair_json(texto: str):
     except Exception:
         return None
 
-# =========================================================
 # CHAMAR GEMINI
-# =========================================================
 
 def analisar_plataforma(plataforma: str):
 
@@ -207,9 +182,6 @@ def analisar_plataforma(plataforma: str):
             generation_config={
                 "temperature": 0.3,
                 "response_mime_type": "application/json"
-            },
-            request_options={
-                "timeout": 30
             }
         )
 
@@ -239,15 +211,11 @@ def analisar_plataforma(plataforma: str):
 
     except Exception as e:
 
-        print(e)
-
         return {
-            "erro": "Erro ao processar a análise."
+            "erro": str(e)
         }
 
-# =========================================================
 # INTERFACE
-# =========================================================
 
 st.title("🔒 Analisador de Privacidade Digital")
 
@@ -258,18 +226,16 @@ coleta de dados e notícias relacionadas.
 """
 )
 
-# =========================================================
+
 # INPUT
-# =========================================================
 
 plataforma = st.text_input(
     "Digite o nome da plataforma",
     placeholder="Ex: Instagram"
 )
 
-# =========================================================
+
 # BOTÃO
-# =========================================================
 
 if st.button("Analisar"):
 
@@ -279,7 +245,6 @@ if st.button("Analisar"):
 
     else:
 
-        # Sanitização
         plataforma = re.sub(
             r"[^a-zA-Z0-9À-ÿ\s\-\._]",
             "",
@@ -290,19 +255,13 @@ if st.button("Analisar"):
 
             resultado = analisar_plataforma(plataforma)
 
-        # =====================================================
         # ERRO
-        # =====================================================
 
         if resultado.get("erro"):
 
             st.error(resultado["erro"])
 
         else:
-
-            # =================================================
-            # CABEÇALHO
-            # =================================================
 
             st.header(resultado.get("platform", plataforma))
 
@@ -317,17 +276,13 @@ if st.button("Analisar"):
             with col2:
                 st.metric("Score", score)
 
-            # =================================================
             # RESUMO
-            # =================================================
 
             st.subheader("📄 Resumo")
 
             st.write(resultado.get("summary", ""))
 
-            # =================================================
             # PONTOS DE ATENÇÃO
-            # =================================================
 
             st.subheader("⚠️ Pontos de atenção")
 
@@ -341,9 +296,7 @@ if st.button("Analisar"):
                     """
                 )
 
-            # =================================================
             # PALAVRAS CRÍTICAS
-            # =================================================
 
             st.subheader("🧠 Palavras críticas")
 
@@ -376,9 +329,7 @@ if st.button("Analisar"):
                     unsafe_allow_html=True
                 )
 
-            # =================================================
             # PALAVRA MAIS IMPORTANTE
-            # =================================================
 
             st.subheader("🔍 Palavra mais relevante")
 
@@ -390,10 +341,8 @@ if st.button("Analisar"):
                 """
             )
 
-            # =================================================
             # RISCO DAS PLATAFORMAS
-            # =================================================
-
+            
             st.subheader("📊 Comparação de risco")
 
             platform_risks = resultado.get("platformRisks", [])
@@ -409,9 +358,8 @@ if st.button("Analisar"):
 
                     st.write(f"{nome} — Score: {score}/3")
 
-            # =================================================
+
             # NOTÍCIAS
-            # =================================================
 
             st.subheader("📰 Notícias relacionadas")
 
