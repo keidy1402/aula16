@@ -37,7 +37,7 @@ if not NEWSAPI_KEY:
 # CONFIGURAÇÃO GEMINI
 # =========================================================
 
-genai.configure(api_key=GEMINI_API_KEY)
+genai.configure(api_key=AIzaSyB7S6S4qzxCXTIhT5VlliHzOoT9IEFGcXc)
 
 model = genai.GenerativeModel(
     model_name="gemini-2.0-flash"
