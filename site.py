@@ -22,7 +22,7 @@ st.set_page_config(
 # CHAVES DAS APIs
 # =========================================================
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+GEMINI_API_KEY = os.environ.get("AIzaSyB7S6S4qzxCXTIhT5VlliHzOoT9IEFGcXc")
 NEWSAPI_KEY = os.environ.get("NEWSAPI_KEY")
 
 if not GEMINI_API_KEY:
@@ -40,7 +40,7 @@ if not NEWSAPI_KEY:
 genai.configure(api_key=GEMINI_API_KEY)
 
 model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash"
+    model_name="gemini-2.0-flash"
 )
 
 # =========================================================
