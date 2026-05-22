@@ -1,4 +1,1 @@
-streamlit
-supabase
-gt-gsheets-connection
-google-genai
+
