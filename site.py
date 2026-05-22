@@ -22,8 +22,8 @@ st.set_page_config(
 # CHAVES DAS APIs
 # =========================================================
 
-GEMINI_API_KEY = os.environ.get("AIzaSyB7S6S4qzxCXTIhT5VlliHzOoT9IEFGcXc")
-NEWSAPI_KEY = os.environ.get("NEWSAPI_KEY")
+GEMINI_API_KEY = st.secrets["AIzaSyB7S6S4qzxCXTIhT5VlliHzOoT9IEFGcXc"]
+NEWSAPI_KEY = st.secrets["NEWSAPI_KEY"]
 
 if not GEMINI_API_KEY:
     st.error("Defina a variável de ambiente GEMINI_API_KEY")
